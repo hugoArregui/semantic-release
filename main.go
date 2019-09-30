@@ -356,6 +356,7 @@ func getLastCommit() (string, error) {
 
 func main() {
 	branch, err := getCurrentBranch()
+
 	if err != nil {
 		log.Fatal(err)
 	}
