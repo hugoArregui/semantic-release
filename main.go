@@ -2,7 +2,8 @@ package main
 
 import (
 // 	"context"
-// 	"errors"
+	"errors"
+	"strings"
 	"fmt"
 // 	"github.com/Masterminds/semver"
 // 	"github.com/google/go-github/github"
@@ -342,26 +343,82 @@ import (
 // 	return ret
 // }
 
-func getCurrentBranch() (string, error) {
-	branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+func runGit(args ...string) ([]string, error) {
+	out, err := exec.Command("git", args...).Output()
+	if err != nil {
+		return nil, err
+	}
+	r := strings.Split(strings.TrimSpace(string(out)), "\n")
+	return r, nil
+}
+
+func runGitOneLine(args ...string) (string, error) {
+	out, err := runGit(args...)
 	if err != nil {
 		return "", err
 	}
-	return string(branch), nil
+
+	return out[0], nil
 }
 
-func getLastCommit() (string, error) {
-// git rev-parse HEAD
+func getCurrentBranch() (string, error) {
+	return runGitOneLine("rev-parse", "--abbrev-ref", "HEAD")
+}
+
+func getCommitsBetween(f, t string) ([]string, error) {
+	if f == "" && t == "" {
+		return nil, errors.New("invalid commit range")
+	}
+
+	if f == "" {
+		return []string{t}, nil
+	}
+
+	if t == "" {
+		return []string{f}, nil
+	}
+
+	return runGit("rev-list", fmt.Sprintf("%s..%s", f, t))
+}
+
+func getCommitTitle(c string) (string, error) {
+	return runGitOneLine("show", "-s", "--pretty=%s")
+}
+
+func getCommitBody(c string) (string, error) {
+	return runGitOneLine("show", "-s", "--pretty=%b")
 }
 
 func main() {
+	fromCommit := "0aff6e71f82ccc90697a005386f38ddc79d09cbc"
+	toCommit := "5f9493d2726354d09dc0215600f18710f88c8d03"
+
 	branch, err := getCurrentBranch()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("The brach is %s\n", branch)
+	fmt.Printf("The branch is %s\n", branch)
 
-	fromCommit := ""
-	toCommit := ""
+	commits, err := getCommitsBetween(fromCommit, toCommit)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("commits", commits)
+	for _, commit := range commits {
+		fmt.Println("commit", commit)
+		title, err := getCommitTitle(commit)
+		if err != nil {
+			log.Fatal(err)
+		}
+		body, err := getCommitBody(commit)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
+	}
+
+	fmt.Println("HERE")
 }
