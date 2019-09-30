@@ -362,7 +362,6 @@ func main() {
 
 	fmt.Printf("The brach is %s\n", branch)
 
-
 	fromCommit := ""
 	toCommit := ""
 }
