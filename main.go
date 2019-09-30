@@ -8,7 +8,7 @@ import (
 // 	"github.com/Masterminds/semver"
 // 	"github.com/google/go-github/github"
 // 	"golang.org/x/oauth2"
-// 	"regexp"
+	"regexp"
 // 	"sort"
 // 	"strconv"
 // 	"strings"
@@ -17,8 +17,8 @@ import (
 	"os/exec"
 )
 
-// var commitPattern = regexp.MustCompile("^(\\w*)(?:\\((.*)\\))?\\: (.*)$")
-// var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
+var commitPattern = regexp.MustCompile("^(\\w*)(?:\\((.*)\\))?\\: (.*)$")
+var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
 // type Change struct {
 // 	Major, Minor, Patch bool
@@ -382,16 +382,16 @@ func getCommitsBetween(f, t string) ([]string, error) {
 }
 
 func getCommitTitle(c string) (string, error) {
-	return runGitOneLine("show", "-s", "--pretty=%s")
+	return runGitOneLine("show", "-s", "--pretty=%s", c)
 }
 
 func getCommitBody(c string) (string, error) {
-	return runGitOneLine("show", "-s", "--pretty=%b")
+	return runGitOneLine("show", "-s", "--pretty=%b", c)
 }
 
 func main() {
 	fromCommit := "0aff6e71f82ccc90697a005386f38ddc79d09cbc"
-	toCommit := "5f9493d2726354d09dc0215600f18710f88c8d03"
+	toCommit := "53a74c1d8c20419d266d8852fe0642e99c0a16ad"
 
 	branch, err := getCurrentBranch()
 	if err != nil {
@@ -407,7 +407,6 @@ func main() {
 
 	fmt.Println("commits", commits)
 	for _, commit := range commits {
-		fmt.Println("commit", commit)
 		title, err := getCommitTitle(commit)
 		if err != nil {
 			log.Fatal(err)
@@ -417,8 +416,30 @@ func main() {
 			log.Fatal(err)
 		}
 
+		if len(title) == 0 {
+			log.Fatalf("invalid empty commit message, commit: %s", commit)
+		}
+
+		if len(title) > 70 {
+			log.Fatalf("commit title too long, commit: %s", commit)
+		}
+
+		found := commitPattern.FindAllStringSubmatch(title, -1)
+		if len(found) < 1 {
+			log.Fatalf(`commit title did not follow semantic versioning: %s.
+Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commit-message-format`, title)
+		}
+
+		// changeType := strings.ToLower(found[0][1])
+		// changeScope := found[0][2]
+		// changeMessage := found[0][3]
+
+		// c.Change = Change{
+		// 	Major: breakingPattern.MatchString(commit.Commit.GetMessage()),
+		// 	Minor: c.Type == "feat",
+		// 	Patch: c.Type == "fix",
+		// }
+
 		fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
 	}
-
-	fmt.Println("HERE")
 }
