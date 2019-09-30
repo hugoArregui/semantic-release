@@ -342,11 +342,26 @@ import (
 // 	return ret
 // }
 
+func getCurrentBranch() (string, error) {
+	branch, err := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD").Output()
+	if err != nil {
+		return "", err
+	}
+	return string(branch), nil
+}
+
+func getLastCommit() (string, error) {
+// git rev-parse HEAD
+}
 
 func main() {
-	out, err := exec.Command("git", "rev-parse --abbrev-ref HEAD").Output()
+	branch, err := getCurrentBranch()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("The brach is %s\n", out)
+
+	fmt.Printf("The brach is %s\n", branch)
+
+	fromCommit := ""
+	toCommit := ""
 }
