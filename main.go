@@ -17,7 +17,7 @@ import (
 	"os/exec"
 )
 
-var commitPattern = regexp.MustCompile("^(\\w*)(?:\\((.*)\\))?\\: (.*)$")
+var commitPattern = regexp.MustCompile("^(feat|fix|docs|style|refactor|perf|test|chore)(?:\\((.*)\\))?\\: (.*)$")
 var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
 // type Change struct {
@@ -391,7 +391,7 @@ func getCommitBody(c string) (string, error) {
 
 func main() {
 	fromCommit := "0aff6e71f82ccc90697a005386f38ddc79d09cbc"
-	toCommit := "53a74c1d8c20419d266d8852fe0642e99c0a16ad"
+	toCommit := "161fdb05340e18fade945b5c20134fcc527ab502"
 
 	branch, err := getCurrentBranch()
 	if err != nil {
@@ -430,9 +430,9 @@ func main() {
 Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commit-message-format`, title)
 		}
 
-		// changeType := strings.ToLower(found[0][1])
-		// changeScope := found[0][2]
-		// changeMessage := found[0][3]
+		changeType := strings.ToLower(found[0][1])
+		changeScope := found[0][2]
+		changeMessage := found[0][3]
 
 		// c.Change = Change{
 		// 	Major: breakingPattern.MatchString(commit.Commit.GetMessage()),
@@ -441,5 +441,6 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		// }
 
 		fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
+		fmt.Printf("type: %s, scope: %s, message:%s \n", changeType, changeScope, changeMessage)
 	}
 }
