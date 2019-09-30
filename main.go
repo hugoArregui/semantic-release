@@ -391,7 +391,7 @@ func getCommitBody(c string) (string, error) {
 
 func main() {
 	fromCommit := "0aff6e71f82ccc90697a005386f38ddc79d09cbc"
-	toCommit := "161fdb05340e18fade945b5c20134fcc527ab502"
+	toCommit := "895d94dc0d30b01b1427013edb66bc1794a1b9be"
 
 	branch, err := getCurrentBranch()
 	if err != nil {
