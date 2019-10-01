@@ -103,6 +103,8 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 			newVersion = latestVersion.IncPatch()
 		}
 
+		fmt.Println("new version:", newVersion.String())
+
 		name := fmt.Sprintf("v%s", newVersion.String())
 		tag := &github.Tag{
 			Tag: &name,
