@@ -10,6 +10,7 @@ import (
 func runGit(args ...string) ([]string, error) {
 	out, err := exec.Command("git", args...).Output()
 	if err != nil {
+		fmt.Println("command failed: git", strings.Join(args, " "))
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			fmt.Println(string(exitErr.Stderr))
 		} else {
