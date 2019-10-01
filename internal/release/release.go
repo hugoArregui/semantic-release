@@ -116,6 +116,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 				SHA: &config.ToCommit,
 			},
 		}
+		fmt.Println("SHA", config.ToCommit)
 		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
 		if err != nil {
 			return err
