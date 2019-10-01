@@ -18,16 +18,10 @@ type Config struct {
 	GHToken string
 	Owner string
 	Repo string
+	Branch string
 }
 
 func SemanticRelease(config Config) error {
-	branch, err := getCurrentBranch()
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("The branch is %s\n", branch)
-
 	commits, err := getCommitsBetween(config.FromCommit, config.ToCommit)
 	if err != nil {
 		return err
@@ -35,7 +29,7 @@ func SemanticRelease(config Config) error {
 
 	fmt.Println("commits", commits)
 
-	if branch == "master" {
+	if config.Branch == "master" {
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
@@ -70,7 +64,7 @@ func SemanticRelease(config Config) error {
 Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commit-message-format`, title)
 		}
 
-		if branch == "master" {
+		if config.Branch == "master" {
 			changeType := strings.ToLower(found[0][1])
 			changeScope := found[0][2]
 			changeMessage := found[0][3]
