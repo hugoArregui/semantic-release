@@ -12,4 +12,4 @@ env:
 
 script:
   - make
-  - build/release
+  - build/release-travis

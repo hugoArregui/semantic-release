@@ -10,6 +10,11 @@ import (
 func runGit(args ...string) ([]string, error) {
 	out, err := exec.Command("git", args...).Output()
 	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			fmt.Println(string(exitErr.Stderr))
+		} else {
+			fmt.Println(err.Error())
+		}
 		return nil, err
 	}
 	r := strings.Split(strings.TrimSpace(string(out)), "\n")

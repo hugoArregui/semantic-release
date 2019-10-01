@@ -106,9 +106,15 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		fmt.Println("new version:", newVersion.String())
 
 		name := fmt.Sprintf("v%s", newVersion.String())
+		message := fmt.Sprintf("new release %s", name)
+		objectType := "commit"
 		tag := &github.Tag{
 			Tag: &name,
-			SHA: &config.ToCommit,
+			Message: &message,
+			Object: &github.GitObject{
+				Type: &objectType,
+				SHA: &config.ToCommit,
+			},
 		}
 		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
 		if err != nil {
