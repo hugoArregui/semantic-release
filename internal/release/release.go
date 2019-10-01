@@ -104,25 +104,13 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 
 		fmt.Println("new version:", newVersion.String())
 
-		name := fmt.Sprintf("v%s", newVersion.String())
-		message := fmt.Sprintf("new release %s", name)
-		objectType := "commit"
-		tag := &github.Tag{
-			Tag: &name,
-			Message: &message,
-			Object: &github.GitObject{
-				Type: &objectType,
-				SHA: &commits[len(commits)-1],
-			},
+		tag := fmt.Sprintf("v%s", newVersion.String())
+		ref := "refs/tags/" + tag
+		tagOpts := &github.Reference{
+			Ref:    &ref,
+			Object: &github.GitObject{SHA: &commits[0]},
 		}
-
-lastCommit, err := getLastCommit()
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("SHA", commits[len(commits)-1], lastCommit)
-		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
+		_, _, err = ghClient.Git.CreateRef(ctx, config.Owner, config.Repo, tagOpts)
 		if err != nil {
 			return err
 		}

@@ -19,7 +19,7 @@ func main() {
 		FromCommit: "0a12dc1f848a83bc2962e3a78a2f8a29bf98a6c6",
 		GHToken:    ghToken,
 		Owner:      "hugoArregui",
-		Repo:       "semantic-releae",
+		Repo:       "semantic-release",
 		Branch:     branch,
 	}
 
