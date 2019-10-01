@@ -32,7 +32,6 @@ func SemanticRelease(config Config) error {
 	fmt.Println("commits", commits)
 
 	newReleaseType := "patch"
-
 	for _, commit := range commits {
 		title, err := getCommitTitle(commit)
 		if err != nil {
@@ -113,10 +112,10 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 			Message: &message,
 			Object: &github.GitObject{
 				Type: &objectType,
-				SHA: &config.ToCommit,
+				SHA: &commits[len(commits)-1],
 			},
 		}
-		fmt.Println("SHA", config.ToCommit)
+		fmt.Println("SHA", commits[len(commits)-1])
 		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
 		if err != nil {
 			return err
