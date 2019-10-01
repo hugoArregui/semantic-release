@@ -2,11 +2,12 @@ package release
 
 import (
 	"context"
-	"strings"
 	"fmt"
+	"regexp"
+	"strings"
+
 	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
-	"regexp"
 )
 
 var commitPattern = regexp.MustCompile("^(feat|fix|docs|style|refactor|perf|test|chore)(?:\\((.*)\\))?\\: (.*)$")
@@ -14,11 +15,11 @@ var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
 type Config struct {
 	FromCommit string
-	ToCommit string
-	GHToken string
-	Owner string
-	Repo string
-	Branch string
+	ToCommit   string
+	GHToken    string
+	Owner      string
+	Repo       string
+	Branch     string
 }
 
 func SemanticRelease(config Config) error {
@@ -37,14 +38,17 @@ func SemanticRelease(config Config) error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("latest release:" , release)
+		fmt.Println("latest release:", release)
 	}
+
+	newReleaseType := "patch"
 
 	for _, commit := range commits {
 		title, err := getCommitTitle(commit)
 		if err != nil {
 			return err
 		}
+
 		body, err := getCommitBody(commit)
 		if err != nil {
 			return err
@@ -64,21 +68,28 @@ func SemanticRelease(config Config) error {
 Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commit-message-format`, title)
 		}
 
-		if config.Branch == "master" {
-			changeType := strings.ToLower(found[0][1])
-			changeScope := found[0][2]
-			changeMessage := found[0][3]
+		changeType := strings.ToLower(found[0][1])
+		changeScope := found[0][2]
+		changeMessage := found[0][3]
 
-			// c.Change = Change{
-			// 	Major: breakingPattern.MatchString(commit.Commit.GetMessage()),
-			// 	Minor: c.Type == "feat",
-			// 	Patch: c.Type == "fix",
-			// }
-
-			fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
-			fmt.Printf("type: %s, scope: %s, message:%s \n", changeType, changeScope, changeMessage)
+		if breakingPattern.MatchString(body) {
+			changeType = "breaking-change"
 		}
+
+		switch changeType {
+		case "breaking-change":
+			newReleaseType = "major"
+		case "feat":
+			if newReleaseType == "patch" {
+				newReleaseType = "minor"
+			}
+		}
+
+		fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
+		fmt.Printf("type: %s, scope: %s, message:%s \n", changeType, changeScope, changeMessage)
 	}
+
+	fmt.Println("new release type is", newReleaseType)
 
 	return nil
 }

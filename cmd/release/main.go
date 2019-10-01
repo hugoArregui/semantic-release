@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/hugoArregui/semantic-release/internal/release"
+	"log"
 	"os"
 	"strings"
-	"log"
+
+	"github.com/hugoArregui/semantic-release/internal/release"
 )
 
 func main() {
@@ -34,11 +35,11 @@ func main() {
 
 	config := release.Config{
 		FromCommit: commits[0],
-		ToCommit: commits[1],
-		GHToken: ghToken,
-		Owner: repo[0],
-		Repo: repo[1],
-		Branch: branch,
+		ToCommit:   commits[1],
+		GHToken:    ghToken,
+		Owner:      repo[0],
+		Repo:       repo[1],
+		Branch:     branch,
 	}
 
 	if err := release.SemanticRelease(config); err != nil {

@@ -2,10 +2,11 @@ package release
 
 import (
 	"context"
-	"strings"
-	"github.com/Masterminds/semver"
-"github.com/google/go-github/github"
 	"sort"
+	"strings"
+
+	"github.com/Masterminds/semver"
+	"github.com/google/go-github/github"
 )
 
 type Release struct {
