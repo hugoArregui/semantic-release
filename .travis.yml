@@ -1,0 +1,15 @@
+language: go
+
+branches:
+  only:
+  - master
+
+go:
+  - "1.x" # use the latest Go release
+
+env:
+  - GO111MODULE=on
+
+script:
+  - make
+  - build/release
