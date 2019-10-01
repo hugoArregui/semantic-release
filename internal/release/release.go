@@ -103,13 +103,12 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 			newVersion = latestVersion.IncPatch()
 		}
 
-		tag := fmt.Sprintf("v%s", newVersion.String())
-		ref := "refs/tags/" + tag
-		tagOpts := &github.Reference{
-			Ref:    &ref,
-			Object: &github.GitObject{SHA: &config.ToCommit},
+		name := fmt.Sprintf("v%s", newVersion.String())
+		tag := &github.Tag{
+			Tag: &name,
+			SHA: &config.ToCommit,
 		}
-		_, _, err = ghClient.Git.CreateRef(ctx, config.Owner, config.Repo, tagOpts)
+		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
 		if err != nil {
 			return err
 		}
