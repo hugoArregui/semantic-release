@@ -115,7 +115,13 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 				SHA: &commits[len(commits)-1],
 			},
 		}
-		fmt.Println("SHA", commits[len(commits)-1])
+
+lastCommit, err := getLastCommit()
+		if err != nil {
+			return err
+		}
+
+		fmt.Println("SHA", commits[len(commits)-1], lastCommit)
 		_, _, err = ghClient.Git.CreateTag(ctx, config.Owner, config.Repo, tag)
 		if err != nil {
 			return err
