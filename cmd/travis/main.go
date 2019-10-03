@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"fmt"
 
 	"github.com/hugoArregui/semantic-release/internal/release"
 )
@@ -29,7 +30,12 @@ func main() {
 		log.Fatal("missing TRAVIS_REPO_SLUG")
 	}
 
-	// pr, ok := os.LookupEnv("TRAVIS_PULL_REQUEST")
+	pr, ok := os.LookupEnv("TRAVIS_PULL_REQUEST")
+	if !ok {
+		log.Fatal("missing TRAVIS_PULL_REQUEST")
+	}
+
+	fmt.Println("PR", pr)
 	commits := strings.Split(commitRange, "...")
 	repo := strings.Split(slug, "/")
 
