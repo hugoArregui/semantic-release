@@ -81,7 +81,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 
 	fmt.Println("new release type is", newReleaseType)
 
-	if !config.IsPR {
+	if config.Branch == "master" && !config.IsPR {
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
