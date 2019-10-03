@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 	"strings"
-	"fmt"
 
 	"github.com/hugoArregui/semantic-release/internal/release"
 )
@@ -35,7 +34,6 @@ func main() {
 		log.Fatal("missing TRAVIS_PULL_REQUEST")
 	}
 
-	fmt.Println("PR", pr)
 	commits := strings.Split(commitRange, "...")
 	repo := strings.Split(slug, "/")
 
@@ -46,6 +44,7 @@ func main() {
 		Owner:      repo[0],
 		Repo:       repo[1],
 		Branch:     branch,
+		IsPR:       pr != "0",
 	}
 
 	if err := release.SemanticRelease(config); err != nil {
