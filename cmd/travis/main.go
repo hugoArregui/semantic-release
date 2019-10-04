@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/hugoArregui/semantic-release/internal/release"
+	"github.com/hugoArregui/semantic-release/pkg/release"
 )
 
 func main() {
@@ -38,13 +38,13 @@ func main() {
 	repo := strings.Split(slug, "/")
 
 	config := release.Config{
-		FromCommit: commits[0],
-		ToCommit:   commits[1],
-		GHToken:    ghToken,
-		Owner:      repo[0],
-		Repo:       repo[1],
-		Branch:     branch,
-		IsPR:       pr != "0",
+		FromCommit:   commits[0],
+		ToCommit:     commits[1],
+		GHToken:      ghToken,
+		Owner:        repo[0],
+		Repo:         repo[1],
+		Branch:       branch,
+		IsPR:         pr != "0",
 		DebugEnabled: true,
 	}
 

@@ -21,11 +21,11 @@ const (
 
 func (c versionChangeType) String() string {
 	switch c {
-		case versionChangeTypePatch:
+	case versionChangeTypePatch:
 		return "patch"
-		case versionChangeTypeMinor:
+	case versionChangeTypeMinor:
 		return "minor"
-		case versionChangeTypeMajor:
+	case versionChangeTypeMajor:
 		return "major"
 	}
 	return "Unknown version change type"
@@ -35,16 +35,15 @@ var commitPattern = regexp.MustCompile("^(feat|fix|docs|style|refactor|perf|test
 var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
 type Config struct {
-	FromCommit string
-	ToCommit   string
-	GHToken    string
-	Owner      string
-	Repo       string
-	Branch     string
-	IsPR       bool
+	FromCommit   string
+	ToCommit     string
+	GHToken      string
+	Owner        string
+	Repo         string
+	Branch       string
+	IsPR         bool
 	DebugEnabled bool
 }
-
 
 type Logger struct {
 	debugEnabled bool
@@ -110,7 +109,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
-		latestVersion, err := getLatestVersion(ctx, ghClient, config.Owner, config.Repo)
+		latestVersion, err := GetLatestVersion(ctx, ghClient, config.Owner, config.Repo)
 		if err != nil {
 			return err
 		}
@@ -147,7 +146,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 	return nil
 }
 
-func getLatestVersion(ctx context.Context, ghClient *github.Client, owner, repo string) (*semver.Version, error) {
+func GetLatestVersion(ctx context.Context, ghClient *github.Client, owner, repo string) (*semver.Version, error) {
 	opts := &github.ReferenceListOptions{"tags", github.ListOptions{PerPage: 100}}
 	lastVersion := &semver.Version{}
 	for {
