@@ -61,7 +61,7 @@ func (l *Logger) Info(msg string, v ...interface{}) {
 
 func SemanticRelease(config Config) error {
 	logger := Logger{debugEnabled: config.DebugEnabled}
-	commits, err := getCommitsBetween(config.FromCommit, config.ToCommit)
+	commits, err := GetCommitsBetween(config.FromCommit, config.ToCommit)
 	if err != nil {
 		return err
 	}
@@ -70,12 +70,12 @@ func SemanticRelease(config Config) error {
 
 	newReleaseType := versionChangeTypePatch
 	for _, commit := range commits {
-		title, err := getCommitTitle(commit)
+		title, err := GetCommitTitle(commit)
 		if err != nil {
 			return err
 		}
 
-		body, err := getCommitBody(commit)
+		body, err := GetCommitBody(commit)
 		if err != nil {
 			return err
 		}
@@ -147,7 +147,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 }
 
 func GetLatestVersion(ctx context.Context, ghClient *github.Client, owner, repo string) (*semver.Version, error) {
-	opts := &github.ReferenceListOptions{"tags", github.ListOptions{PerPage: 100}}
+	opts := &github.ReferenceListOptions{Type: "tags", ListOptions: github.ListOptions{PerPage: 100}}
 	lastVersion := &semver.Version{}
 	for {
 		refs, resp, err := ghClient.Git.ListRefs(ctx, owner, repo, opts)
