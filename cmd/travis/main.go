@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -48,7 +49,12 @@ func main() {
 		DebugEnabled: true,
 	}
 
-	if err := release.SemanticRelease(config); err != nil {
-		log.Fatal(err)
+	err := release.SemanticRelease(config)
+	if err != nil {
+		if err != release.ErrInvalidCommitRange {
+			log.Fatal(err)
+		}
+
+		fmt.Println("invalid commit range, cannot execute semantic-release")
 	}
 }

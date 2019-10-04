@@ -2,6 +2,7 @@ package release
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -19,6 +20,8 @@ const (
 	versionChangeTypeMajor
 )
 
+var ErrInvalidCommitRange = errors.New("invalid commit range")
+
 func (c versionChangeType) String() string {
 	switch c {
 	case versionChangeTypePatch:
@@ -30,7 +33,6 @@ func (c versionChangeType) String() string {
 	}
 	return "Unknown version change type"
 }
-
 
 var commitPattern = regexp.MustCompile(`^(feat|fix|docs|style|refactor|perf|test|chore)(?:\((.*)\))?\: (.*)$`)
 var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
@@ -64,7 +66,7 @@ func SemanticRelease(config Config) error {
 	logger := Logger{debugEnabled: config.DebugEnabled}
 	commits, err := GetCommitsBetween(config.FromCommit, config.ToCommit)
 	if err != nil {
-		return err
+		return ErrInvalidCommitRange
 	}
 
 	logger.Debug("commits in range: %s\n", strings.Join(commits, ", "))
