@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func runGit(args ...string) ([]string, error) {
+func RunGit(args ...string) ([]string, error) {
 	out, err := exec.Command("git", args...).Output()
 	if err != nil {
 		fmt.Println("command failed: git", strings.Join(args, " "))
@@ -22,8 +22,8 @@ func runGit(args ...string) ([]string, error) {
 	return r, nil
 }
 
-func runGitOneLine(args ...string) (string, error) {
-	out, err := runGit(args...)
+func RunGitOneLine(args ...string) (string, error) {
+	out, err := RunGit(args...)
 	if err != nil {
 		return "", err
 	}
@@ -31,34 +31,34 @@ func runGitOneLine(args ...string) (string, error) {
 	return out[0], nil
 }
 
-func getCurrentBranch() (string, error) {
-	return runGitOneLine("rev-parse", "--abbrev-ref", "HEAD")
+func GetCurrentBranch() (string, error) {
+	return RunGitOneLine("rev-parse", "--abbrev-ref", "HEAD")
 }
 
-func getLastCommit() (string, error) {
-	return runGitOneLine("rev-parse", "HEAD")
+func GetLastCommit() (string, error) {
+	return RunGitOneLine("rev-parse", "HEAD")
 }
 
-func getCommitsBetween(f, t string) ([]string, error) {
+func GetCommitsBetween(f, t string) ([]string, error) {
 	if f == "" {
 		return nil, errors.New("invalid commit range, no from provided")
 	}
 
 	if t == "" {
 		var err error
-		t, err = getLastCommit()
+		t, err = GetLastCommit()
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	return runGit("rev-list", fmt.Sprintf("%s..%s", f, t))
+	return RunGit("rev-list", fmt.Sprintf("%s..%s", f, t))
 }
 
-func getCommitTitle(c string) (string, error) {
-	return runGitOneLine("show", "-s", "--pretty=%s", c)
+func GetCommitTitle(c string) (string, error) {
+	return RunGitOneLine("show", "-s", "--pretty=%s", c)
 }
 
-func getCommitBody(c string) (string, error) {
-	return runGitOneLine("show", "-s", "--pretty=%b", c)
+func GetCommitBody(c string) (string, error) {
+	return RunGitOneLine("show", "-s", "--pretty=%b", c)
 }
