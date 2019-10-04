@@ -31,7 +31,8 @@ func (c versionChangeType) String() string {
 	return "Unknown version change type"
 }
 
-var commitPattern = regexp.MustCompile("^(feat|fix|docs|style|refactor|perf|test|chore)(?:\\((.*)\\))?\\: (.*)$")
+
+var commitPattern = regexp.MustCompile(`^(feat|fix|docs|style|refactor|perf|test|chore)(?:\((.*)\))?\: (.*)$`)
 var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
 type Config struct {
@@ -101,6 +102,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		} else if changeType == "feat" && newReleaseType < versionChangeTypeMinor {
 			newReleaseType = versionChangeTypeMinor
 		}
+		logger.Debug("type: %s, scope: %s, message: %s\n", changeType, found[0][2], found[0][3])
 	}
 
 	logger.Debug("change is %s\n", newReleaseType.String())
