@@ -85,12 +85,11 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
-		latestRelease, err := getLatestRelease(ctx, ghClient, config.Owner, config.Repo, "")
+		latestVersion, err := getLatestVersion(ctx, ghClient, config.Owner, config.Repo)
 		if err != nil {
 			return err
 		}
 
-		latestVersion := latestRelease.Version
 		fmt.Println("latest version:", latestVersion.String())
 
 		var newVersion semver.Version
@@ -118,4 +117,35 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 	}
 
 	return nil
+}
+
+func getLatestVersion(ctx context.Context, ghClient *github.Client, owner, repo string) (*semver.Version, error) {
+	opts := &github.ReferenceListOptions{"tags", github.ListOptions{PerPage: 100}}
+	lastVersion := &semver.Version{}
+	for {
+		refs, resp, err := ghClient.Git.ListRefs(ctx, owner, repo, opts)
+		if resp != nil && resp.StatusCode == 404 {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		for _, r := range refs {
+			version, err := semver.NewVersion(strings.TrimPrefix(r.GetRef(), "refs/tags/"))
+
+			if lastVersion.LessThan(version) {
+				lastVersion = version
+			}
+
+			if err != nil {
+				continue
+			}
+		}
+		if resp.NextPage == 0 {
+			break
+		}
+		opts.Page = resp.NextPage
+	}
+
+	return lastVersion, nil
 }
