@@ -19,7 +19,8 @@ func main() {
 		Owner:      "hugoArregui",
 		Repo:       "semantic-release",
 		Branch:     "master",
-		IsPR:       true,
+		IsPR:       false,
+		DebugEnabled: true,
 	}
 
 	if err := release.SemanticRelease(config); err != nil {

@@ -41,7 +41,7 @@ func getLastCommit() (string, error) {
 
 func getCommitsBetween(f, t string) ([]string, error) {
 	if f == "" {
-		return nil, errors.New("invalid commit range, no from povided")
+		return nil, errors.New("invalid commit range, no from provided")
 	}
 
 	if t == "" {

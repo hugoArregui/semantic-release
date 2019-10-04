@@ -11,6 +11,26 @@ import (
 	"golang.org/x/oauth2"
 )
 
+type versionChangeType int
+
+const (
+	versionChangeTypePatch versionChangeType = iota + 1
+	versionChangeTypeMinor
+	versionChangeTypeMajor
+)
+
+func (c versionChangeType) String() string {
+	switch c {
+		case versionChangeTypePatch:
+		return "patch"
+		case versionChangeTypeMinor:
+		return "minor"
+		case versionChangeTypeMajor:
+		return "major"
+	}
+	return "Unknown version change type"
+}
+
 var commitPattern = regexp.MustCompile("^(feat|fix|docs|style|refactor|perf|test|chore)(?:\\((.*)\\))?\\: (.*)$")
 var breakingPattern = regexp.MustCompile("BREAKING CHANGES?")
 
@@ -22,17 +42,34 @@ type Config struct {
 	Repo       string
 	Branch     string
 	IsPR       bool
+	DebugEnabled bool
+}
+
+
+type Logger struct {
+	debugEnabled bool
+}
+
+func (l *Logger) Debug(msg string, v ...interface{}) {
+	if l.debugEnabled {
+		fmt.Printf(msg, v...)
+	}
+}
+
+func (l *Logger) Info(msg string, v ...interface{}) {
+	fmt.Printf(msg, v...)
 }
 
 func SemanticRelease(config Config) error {
+	logger := Logger{debugEnabled: config.DebugEnabled}
 	commits, err := getCommitsBetween(config.FromCommit, config.ToCommit)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("commits", commits)
+	logger.Debug("commits in range: %s\n", strings.Join(commits, ", "))
 
-	newReleaseType := "patch"
+	newReleaseType := versionChangeTypePatch
 	for _, commit := range commits {
 		title, err := getCommitTitle(commit)
 		if err != nil {
@@ -59,27 +96,15 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		}
 
 		changeType := strings.ToLower(found[0][1])
-		changeScope := found[0][2]
-		changeMessage := found[0][3]
 
 		if breakingPattern.MatchString(body) {
-			changeType = "breaking-change"
+			newReleaseType = versionChangeTypeMajor
+		} else if changeType == "feat" && newReleaseType < versionChangeTypeMinor {
+			newReleaseType = versionChangeTypeMinor
 		}
-
-		switch changeType {
-		case "breaking-change":
-			newReleaseType = "major"
-		case "feat":
-			if newReleaseType == "patch" {
-				newReleaseType = "minor"
-			}
-		}
-
-		fmt.Printf("commit: %s, title: %s, body: %s\n", commit, title, body)
-		fmt.Printf("type: %s, scope: %s, message:%s \n", changeType, changeScope, changeMessage)
 	}
 
-	fmt.Println("new release type is", newReleaseType)
+	logger.Debug("change is %s\n", newReleaseType.String())
 
 	if config.Branch == "master" && !config.IsPR {
 		ctx := context.TODO()
@@ -90,19 +115,21 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 			return err
 		}
 
-		fmt.Println("latest version:", latestVersion.String())
-
 		var newVersion semver.Version
 		switch newReleaseType {
-		case "major":
+		case versionChangeTypeMajor:
 			newVersion = latestVersion.IncMajor()
-		case "minor":
+		case versionChangeTypeMinor:
 			newVersion = latestVersion.IncMinor()
-		case "feat":
+		case versionChangeTypePatch:
 			newVersion = latestVersion.IncPatch()
+		default:
+			panic("invalid release type")
 		}
 
-		fmt.Println("new version:", newVersion.String())
+		logger.Info("current version: %s, change: %s, new version: %s\n", latestVersion.String(),
+			newReleaseType.String(),
+			newVersion.String())
 
 		tag := fmt.Sprintf("v%s", newVersion.String())
 		ref := "refs/tags/" + tag
@@ -114,6 +141,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		if err != nil {
 			return err
 		}
+		logger.Debug("pushed new tag %s\n", tag)
 	}
 
 	return nil

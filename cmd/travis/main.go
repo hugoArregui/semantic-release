@@ -45,6 +45,7 @@ func main() {
 		Repo:       repo[1],
 		Branch:     branch,
 		IsPR:       pr != "0",
+		DebugEnabled: true,
 	}
 
 	if err := release.SemanticRelease(config); err != nil {
