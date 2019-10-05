@@ -1,6 +1,6 @@
 build:
 	go build -o build/release-travis ./cmd/travis
-	go build -o build/release-local ./cmd/local
+	go build -o build/release-custom ./cmd/custom
 
 fmt:
 	gofmt -w -s .
