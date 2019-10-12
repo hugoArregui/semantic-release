@@ -16,4 +16,7 @@ before_script:
 script:
   - golangci-lint run ./...
   - make
+  - echo $TRAVIS_BRANCH
+  - echo $TRAVIS_COMMIT_RANGE
+  - echo $TRAVIS_PULL_REQUEST
   - build/release-travis
