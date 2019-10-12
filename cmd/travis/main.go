@@ -49,8 +49,6 @@ func main() {
 		DebugEnabled: true,
 	}
 
-	fmt.Println("OPTIONS", pr, config.IsPR)
-
 	err := release.SemanticRelease(config)
 	if err != nil {
 		if err != release.ErrInvalidCommitRange {
