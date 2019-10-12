@@ -123,7 +123,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 			return err
 		}
 
-		logger.Debug("latest version is", latestVersion.String())
+		logger.Debug("latest version is %s", latestVersion.String())
 
 		var newVersion semver.Version
 		switch newReleaseType {
