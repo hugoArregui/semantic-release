@@ -109,11 +109,15 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 
 	logger.Debug("change is %s\n", newReleaseType.String())
 
+	fmt.Println("HERE")
 	if config.Branch != "master" {
 		logger.Debug("not in master, skip tag")
+	fmt.Println("HERE2")
 	} else if !config.IsPR {
 		logger.Debug("IsPR is true, skip tag")
+	fmt.Println("HERE3")
 	} else {
+	fmt.Println("HERE4")
 		logger.Debug("going to tag a new version")
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
