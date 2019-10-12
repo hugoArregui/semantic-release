@@ -45,7 +45,7 @@ func main() {
 		Owner:        repo[0],
 		Repo:         repo[1],
 		Branch:       branch,
-		IsPR:         pr != "0",
+		IsPR:         pr != "false",
 		DebugEnabled: true,
 	}
 
