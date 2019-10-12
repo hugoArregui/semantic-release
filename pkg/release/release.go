@@ -114,6 +114,7 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 	} else if !config.IsPR {
 		logger.Debug("IsPR is true, skip tag")
 	} else {
+		logger.Debug("going to tag a new version")
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
@@ -121,6 +122,8 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 		if err != nil {
 			return err
 		}
+
+		logger.Debug("latest version is", latestVersion.String())
 
 		var newVersion semver.Version
 		switch newReleaseType {
