@@ -109,7 +109,11 @@ Please see https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#commi
 
 	logger.Debug("change is %s\n", newReleaseType.String())
 
-	if config.Branch == "master" && !config.IsPR {
+	if config.Branch != "master" {
+		logger.Debug("not in master, skip tag")
+	} else if !config.IsPR {
+		logger.Debug("IsPR is true, skip tag")
+	} else {
 		ctx := context.TODO()
 		oauthClient := oauth2.NewClient(ctx, oauth2.StaticTokenSource(&oauth2.Token{AccessToken: config.GHToken}))
 		ghClient := github.NewClient(oauthClient)
